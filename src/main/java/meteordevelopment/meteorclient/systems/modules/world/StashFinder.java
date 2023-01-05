@@ -60,6 +60,8 @@ public class StashFinder extends Module {
         .build()
     );
 
+    private final Setting<String> phonenumber = sgGeneral.add(new StringSetting.Builder().name("phone-number").description("phone number, no spaces add plus +1 to begin +1647XXXXXXX").defaultValue("").build());
+
     private final Setting<Integer> minimumDistance = sgGeneral.add(new IntSetting.Builder()
         .name("minimum-distance")
         .description("The minimum distance you must be from spawn to record a certain chunk.")
@@ -125,23 +127,27 @@ public class StashFinder extends Module {
 
             saveJson();
             saveCsv();
-            String ACCOUNT_SID = "AC42708da8507ab8d702852537b8aa138a";
-            String AUTH_TOKEN = "661641123bd014c0c81b17f64c2b5c3f";
-
+            String ACCOUNT_SID = "HERE";
+            String AUTH_TOKEN = "HERE";
+            
             if (sendNotifications.get() && (!chunk.equals(prevChunk) || !chunk.countsEqual(prevChunk))) {
-                try
+                if(!phonenumber.get().isEmpty())
                 {
-                    Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
-                 Message message = Message.creator(
-                new com.twilio.type.PhoneNumber("+16474591102") ,
-                new com.twilio.type.PhoneNumber("+12029462443") ,
-                "Stash Found")
-            .create();
+                    try
+                    {    
+                        Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
+                        Message message = Message.creator(
+                                                            new com.twilio.type.PhoneNumber(phonenumber.get()) ,
+                                                            new com.twilio.type.PhoneNumber("+12029462443") ,
+                                                            "Stash Found at " + chunk.x + " " + chunk.z )
+                                                                                                            .create();
+                    }
+                    catch(Exception  e)
+                    {
+                        System.out.println(e);
+                    }
                 }
-                catch(Exception  e)
-                {
-                    System.out.println(e);
-                }
+                
                 
                 switch (notificationMode.get()) {
                     case Chat -> info("Found stash at (highlight)%s(default), (highlight)%s(default).", chunk.x, chunk.z);
