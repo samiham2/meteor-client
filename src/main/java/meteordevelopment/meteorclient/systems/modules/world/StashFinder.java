@@ -61,7 +61,8 @@ public class StashFinder extends Module {
     );
 
     private final Setting<String> phonenumber = sgGeneral.add(new StringSetting.Builder().name("phone-number").description("phone number, no spaces add plus +1 to begin +1647XXXXXXX").defaultValue("").build());
-
+    private final Setting<String> twiliosid = sgGeneral.add(new StringSetting.Builder().name("twilio-sid").description("sid for twilio").defaultValue("").build());
+    private final Setting<String> twiliotoken = sgGeneral.add(new StringSetting.Builder().name("twilio-token").description("auth token for twilio").defaultValue("").build());
     private final Setting<Integer> minimumDistance = sgGeneral.add(new IntSetting.Builder()
         .name("minimum-distance")
         .description("The minimum distance you must be from spawn to record a certain chunk.")
@@ -127,15 +128,14 @@ public class StashFinder extends Module {
 
             saveJson();
             saveCsv();
-            String ACCOUNT_SID = "HERE";
-            String AUTH_TOKEN = "HERE";
+            
             
             if (sendNotifications.get() && (!chunk.equals(prevChunk) || !chunk.countsEqual(prevChunk))) {
-                if(!phonenumber.get().isEmpty())
+                if(!phonenumber.get().isEmpty() && !twiliosid.get().isEmpty() && !twiliotoken.get().isEmpty())
                 {
                     try
                     {    
-                        Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
+                        Twilio.init(twiliosid.get(), twiliotoken.get());
                         Message message = Message.creator(
                                                             new com.twilio.type.PhoneNumber(phonenumber.get()) ,
                                                             new com.twilio.type.PhoneNumber("+12029462443") ,
