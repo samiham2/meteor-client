@@ -31,6 +31,7 @@ repositories {
         name = "vram"
         url = "https://maven.vram.io//"
     }
+   
     mavenCentral()
 }
 
@@ -66,7 +67,7 @@ dependencies {
     library "org.reflections:reflections:${project.reflections_version}"
     library("io.netty:netty-handler-proxy:${project.netty_version}") { transitive = false }
     library("io.netty:netty-codec-socks:${project.netty_version}") { transitive = false }
-
+    implementation group: "com.twilio.sdk", name: "twilio", version: "9.2.0"
     // Launch sub project
     shadow project(":launch")
 }

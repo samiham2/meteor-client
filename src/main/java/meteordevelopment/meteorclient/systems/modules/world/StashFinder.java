@@ -35,6 +35,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
+
 public class StashFinder extends Module {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -121,8 +125,24 @@ public class StashFinder extends Module {
 
             saveJson();
             saveCsv();
+            String ACCOUNT_SID = "AC42708da8507ab8d702852537b8aa138a";
+            String AUTH_TOKEN = "661641123bd014c0c81b17f64c2b5c3f";
 
             if (sendNotifications.get() && (!chunk.equals(prevChunk) || !chunk.countsEqual(prevChunk))) {
+                try
+                {
+                    Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
+                 Message message = Message.creator(
+                new com.twilio.type.PhoneNumber("+16474591102") ,
+                new com.twilio.type.PhoneNumber("+12029462443") ,
+                "Stash Found")
+            .create();
+                }
+                catch(Exception  e)
+                {
+                    System.out.println(e);
+                }
+                
                 switch (notificationMode.get()) {
                     case Chat -> info("Found stash at (highlight)%s(default), (highlight)%s(default).", chunk.x, chunk.z);
                     case Toast -> mc.getToastManager().add(new MeteorToast(Items.CHEST, title, "Found Stash!"));
